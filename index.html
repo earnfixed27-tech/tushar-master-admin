@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TUSHAR DEV | MASTER CONTROL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white font-sans">
+    <div id="adminAuth" class="fixed inset-0 bg-black z-[100] flex items-center justify-center p-6">
+        <div class="w-full max-w-sm text-center">
+            <h1 class="text-4xl font-black mb-8 text-blue-500 italic">TUSHAR DEV</h1>
+            <input type="password" id="masterKey" placeholder="Enter Master Secret Key" class="w-full p-5 bg-white/10 rounded-3xl border border-white/20 outline-none focus:border-blue-500 mb-4">
+            <button onclick="checkMaster()" class="w-full bg-blue-600 py-5 rounded-3xl font-black">UNLOCK SYSTEM</button>
+        </div>
+    </div>
+
+    <div id="adminDashboard" class="hidden p-6 max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
+            <h2 class="text-2xl font-black uppercase tracking-tighter">Control Center</h2>
+            <div class="text-right"><p class="text-[10px] text-slate-500 font-bold uppercase">Data Status</p><p class="text-green-500 font-bold">● CLOUD ACTIVE</p></div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white/5 p-8 rounded-[40px] border border-white/10">
+                <h3 class="text-lg font-bold mb-6 text-blue-400">Add New Client</h3>
+                <input id="sId" placeholder="Unique ID (eg: shop101)" class="w-full p-4 mb-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                <input id="sName" placeholder="Business Name" class="w-full p-4 mb-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                <input id="sPass" placeholder="Create Password" class="w-full p-4 mb-8 bg-white/5 rounded-2xl outline-none border border-white/10">
+                <button onclick="addClient()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase tracking-widest text-sm shadow-2xl">Activate License</button>
+            </div>
+            
+            <div class="bg-white/5 p-8 rounded-[40px] border border-white/10 overflow-y-auto max-h-[400px]">
+                <h3 class="text-lg font-bold mb-6 text-green-400">Live Client Monitor</h3>
+                <div id="clientList" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgDH1ovCNJ5gLDsEpnnYzwVmMQT8Yutss",
+            databaseURL: "https://tushardeveloper-f11d5-default-rtdb.firebaseio.com",
+            projectId: "tushardeveloper-f11d5",
+            appId: "1:715461297322:web:974d61939443563c51bcd3"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.checkMaster = () => {
+            if(document.getElementById('masterKey').value === "master7143") {
+                document.getElementById('adminAuth').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                loadClients();
+            } else { alert("WRONG MASTER KEY!"); }
+        };
+
+        window.addClient = () => {
+            const id = document.getElementById('sId').value.toLowerCase().trim();
+            set(ref(db, 'shops/' + id), {
+                name: document.getElementById('sName').value,
+                pass: document.getElementById('sPass').value,
+                status: "active",
+                expiry: "lifetime"
+            }).then(() => { alert("Shop Activated!"); location.reload(); });
+        };
+
+        function loadClients() {
+            onValue(ref(db, 'shops'), (snap) => {
+                const list = document.getElementById('clientList'); list.innerHTML = "";
+                snap.forEach(c => {
+                    list.innerHTML += `<div class="p-4 bg-white/5 rounded-2xl flex justify-between items-center border border-white/5">
+                        <div><p class="font-bold text-sm">${c.val().name}</p><p class="text-[10px] text-slate-500">${c.key} | Pass: ${c.val().pass}</p></div>
+                        <button onclick="deleteShop('${c.key}')" class="text-red-500 font-bold text-[10px] uppercase">Revoke</button>
+                    </div>`;
+                });
+            });
+        }
+        window.deleteShop = (id) => { if(confirm("Delete this shop?")) remove(ref(db, 'shops/'+id)); };
+    </script>
+</body>
+</html>
