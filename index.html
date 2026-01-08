@@ -2,39 +2,36 @@
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
-    <title>TUSHAR DEV | MASTER ADMIN</title>
+    <title>MASTER CONTROL | TUSHAR DEV</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0b0f1a] text-white p-6">
+<body class="bg-[#0b0f1a] text-white p-6 font-sans">
     <div id="adminAuth" class="fixed inset-0 bg-[#0b0f1a] z-[100] flex items-center justify-center p-6">
         <div class="w-full max-w-sm text-center">
             <h1 class="text-4xl font-black mb-8 text-blue-500 italic">TUSHAR DEV</h1>
-            <input type="password" id="masterKey" placeholder="Password" class="w-full p-5 bg-white/5 rounded-3xl border border-white/10 outline-none text-center mb-4">
-            <button onclick="checkMaster()" class="w-full bg-blue-600 py-5 rounded-3xl font-black shadow-2xl">UNLOCK SYSTEM</button>
+            <input type="password" id="masterKey" placeholder="Password: tushar123" class="w-full p-5 bg-white/5 rounded-3xl border border-white/10 outline-none text-center mb-4">
+            <button onclick="checkMaster()" class="w-full bg-blue-600 py-5 rounded-3xl font-black">UNLOCK SYSTEM</button>
         </div>
     </div>
 
     <div id="dashboard" class="hidden max-w-5xl mx-auto">
-        <h2 class="text-2xl font-black text-blue-400 mb-8 border-b border-white/10 pb-4 uppercase">Master Control Center</h2>
+        <h2 class="text-2xl font-black text-blue-400 mb-8 border-b border-white/10 pb-4">SHOP REGISTRATION CENTER</h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="bg-white/5 p-8 rounded-[40px] border border-white/10">
-                <h3 class="text-lg font-bold mb-6 text-green-400">Register New Shop</h3>
-                <div class="space-y-4">
-                    <input id="sLogo" placeholder="Logo Image URL (Link)" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
-                    <div class="grid grid-cols-2 gap-3">
-                        <input id="sId" placeholder="Unique ID" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
-                        <input id="sPass" placeholder="Set Password" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
-                    </div>
-                    <input id="sName" placeholder="Full Shop Name" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
-                    <input id="sAddr" placeholder="Shop Address" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
-                    <div class="grid grid-cols-2 gap-3">
-                        <input id="sPhone1" placeholder="Phone 1 (WhatsApp)" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
-                        <input id="sInsta" placeholder="Instagram Username (eg: tushar_dev)" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
-                    </div>
-                    <input id="sGst" placeholder="GST Number" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
-                    <textarea id="sSlogan" placeholder="Short Slogan" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10 h-20"></textarea>
-                    <button onclick="activateShop()" class="w-full bg-blue-600 py-5 rounded-[28px] font-black shadow-2xl">ACTIVATE SHOP</button>
+            <div class="bg-white/5 p-8 rounded-[40px] border border-white/10 shadow-2xl space-y-4">
+                <input id="sLogo" placeholder="Shop Logo URL (Link)" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="sId" placeholder="Unique Shop ID" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                    <input id="sPass" placeholder="Set Password" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
                 </div>
+                <input id="sName" placeholder="Full Shop Name" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                <input id="sAddr" placeholder="Shop Address" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="sPhone1" placeholder="WhatsApp Number" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                    <input id="sInsta" placeholder="Instagram Username" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                </div>
+                <input id="sGst" placeholder="GST Number" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                <textarea id="sSlogan" placeholder="Shop Slogan" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10 h-20"></textarea>
+                <button onclick="activateShop()" class="w-full bg-blue-600 py-5 rounded-[28px] font-black shadow-2xl">ACTIVATE & SYNC</button>
             </div>
             <div id="clientList" class="space-y-4 overflow-y-auto max-h-[600px]"></div>
         </div>
@@ -63,6 +60,7 @@
 
         window.activateShop = () => {
             const id = document.getElementById('sId').value.toLowerCase().trim();
+            if(!id) return;
             set(ref(db, 'shops/' + id), {
                 config: {
                     logo: document.getElementById('sLogo').value,
@@ -82,17 +80,17 @@
                 const list = document.getElementById('clientList'); list.innerHTML = "";
                 snap.forEach(c => {
                     const d = c.val().config;
-                    list.innerHTML += `<div class="p-5 bg-white/5 rounded-3xl border border-white/5 flex justify-between items-center">
+                    list.innerHTML += `<div class="p-5 bg-white/5 rounded-3xl border border-white/5 flex justify-between items-center shadow-lg">
                         <div class="flex items-center gap-4">
-                            <img src="${d.logo}" class="w-12 h-12 rounded-full object-cover bg-white">
-                            <div><p class="font-black text-sm">${d.name}</p><p class="text-[10px] text-slate-500">ID: ${c.key}</p></div>
+                            <img src="${d.logo}" class="w-12 h-12 rounded-full object-cover bg-white p-1">
+                            <div><p class="font-black text-sm uppercase">${d.name}</p><p class="text-[10px] text-slate-500">ID: ${c.key}</p></div>
                         </div>
-                        <button onclick="deleteShop('${c.key}')" class="text-red-500 font-bold text-xs uppercase">Delete</button>
+                        <button onclick="deleteShop('${c.key}')" class="text-red-500 font-bold text-xs">REMOVE</button>
                     </div>`;
                 });
             });
         }
-        window.deleteShop = (id) => { if(confirm("Confirm Delete?")) remove(ref(db, 'shops/'+id)); };
+        window.deleteShop = (id) => { if(confirm("Permanently remove this shop?")) remove(ref(db, 'shops/'+id)); };
     </script>
 </body>
 </html>
