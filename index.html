@@ -1,23 +1,111 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <title>MASTER CONTROL | TUSHAR DEV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b0f1a] text-white font-sans p-6">
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAgDH1ovCNJ5gLDsEpnnYzwVmMQT8Yutss",
-        databaseURL: "https://tushardeveloper-f11d5-default-rtdb.firebaseio.com",
-        projectId: "tushardeveloper-f11d5",
-        appId: "1:715461297322:web:974d61939443563c51bcd3"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    <div id="adminAuth" class="fixed inset-0 bg-[#0b0f1a] z-[100] flex items-center justify-center p-6">
+        <div class="w-full max-w-sm text-center">
+            <h1 class="text-4xl font-black mb-8 text-blue-500 italic">TUSHAR DEV</h1>
+            <input type="password" id="masterKey" placeholder="Enter Master Key" class="w-full p-5 bg-white/5 rounded-3xl border border-white/10 outline-none focus:border-blue-500 mb-4 text-center">
+            <button onclick="checkMaster()" class="w-full bg-blue-600 py-5 rounded-3xl font-black shadow-2xl">UNLOCK SYSTEM</button>
+        </div>
+    </div>
 
-    window.checkMaster = () => {
-        // Tumcha Password 'tushar123' yithe set kela ahe
-        if(document.getElementById('masterKey').value === "tushar123") {
-            document.getElementById('adminAuth').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            loadClients();
-        } else { alert("चुकीचा पासवर्ड!"); }
-    };
-    // ... (baki admin logic asel)
-</script>
+    <div id="dashboard" class="hidden max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-10 border-b border-white/10 pb-6">
+            <h2 class="text-2xl font-black uppercase text-blue-400 italic">Control Center</h2>
+            <button onclick="location.reload()" class="text-red-400 font-bold">LOGOUT</button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white/5 p-8 rounded-[40px] border border-white/10 shadow-2xl">
+                <h3 class="text-lg font-bold mb-6 text-green-400">Register New Shop</h3>
+                <div class="space-y-4">
+                    <input id="sLogo" placeholder="Logo Image URL (Link)" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10 focus:border-blue-500">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="sId" placeholder="Unique ID" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                        <input id="sPass" placeholder="Set Password" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                    </div>
+                    <input id="sName" placeholder="Full Shop Name" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                    <input id="sAddr" placeholder="Shop Address" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="sPhone1" placeholder="Phone 1 (WhatsApp)" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                        <input id="sPhone2" placeholder="Phone 2" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input id="sInsta" placeholder="Instagram ID" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                        <input id="sGst" placeholder="GST Number" class="p-4 bg-white/5 rounded-2xl outline-none border border-white/10">
+                    </div>
+                    <textarea id="sSlogan" placeholder="Shop Slogan" class="w-full p-4 bg-white/5 rounded-2xl outline-none border border-white/10 h-20"></textarea>
+                    <button onclick="activateShop()" class="w-full bg-blue-600 py-5 rounded-[28px] font-black text-lg shadow-2xl">ACTIVATE SHOP</button>
+                </div>
+            </div>
+
+            <div class="bg-white/5 p-8 rounded-[40px] border border-white/10">
+                <h3 class="text-lg font-bold mb-6 text-yellow-400">Active Clients</h3>
+                <div id="clientList" class="space-y-4 max-h-[500px] overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgDH1ovCNJ5gLDsEpnnYzwVmMQT8Yutss",
+            databaseURL: "https://tushardeveloper-f11d5-default-rtdb.firebaseio.com",
+            projectId: "tushardeveloper-f11d5",
+            appId: "1:715461297322:web:974d61939443563c51bcd3"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.checkMaster = () => {
+            if(document.getElementById('masterKey').value === "tushar123") {
+                document.getElementById('adminAuth').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadClients();
+            } else { alert("WRONG PASSWORD!"); }
+        };
+
+        window.activateShop = () => {
+            const id = document.getElementById('sId').value.toLowerCase().trim();
+            set(ref(db, 'shops/' + id), {
+                config: {
+                    logo: document.getElementById('sLogo').value,
+                    name: document.getElementById('sName').value,
+                    pass: document.getElementById('sPass').value,
+                    addr: document.getElementById('sAddr').value,
+                    phone1: document.getElementById('sPhone1').value,
+                    phone2: document.getElementById('sPhone2').value,
+                    insta: document.getElementById('sInsta').value,
+                    gst: document.getElementById('sGst').value,
+                    slogan: document.getElementById('sSlogan').value
+                }
+            }).then(() => { alert("Shop Activated!"); location.reload(); });
+        };
+
+        function loadClients() {
+            onValue(ref(db, 'shops'), (snap) => {
+                const list = document.getElementById('clientList'); list.innerHTML = "";
+                snap.forEach(c => {
+                    const d = c.val().config;
+                    list.innerHTML += `<div class="p-4 bg-white/5 rounded-2xl flex justify-between items-center border border-white/5">
+                        <div class="flex items-center gap-3">
+                            <img src="${d.logo}" class="w-10 h-10 rounded-full bg-white/10 object-contain">
+                            <div><p class="font-bold text-sm">${d.name}</p><p class="text-[10px] text-slate-500">ID: ${c.key}</p></div>
+                        </div>
+                        <button onclick="deleteShop('${c.key}')" class="text-red-500 font-bold text-[10px] uppercase">Remove</button>
+                    </div>`;
+                });
+            });
+        }
+        window.deleteShop = (id) => { if(confirm("Delete this shop?")) remove(ref(db, 'shops/'+id)); };
+    </script>
+</body>
+</html>
